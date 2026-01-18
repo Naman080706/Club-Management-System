@@ -1,6 +1,6 @@
-/* Color Palette Variables */
+
 :root {
-    /* Base Colors from Table */
+    
     --deep-navy: #0F172A;
     --electric-blue: #2563EB;
     --neon-cyan: #22D3EE;
@@ -8,7 +8,7 @@
     --soft-white: #E5E7EB;
     --neon-red: #F43F5E;
     
-    /* Light Mode Colors */
+    
     --primary-color: var(--electric-blue);
     --accent-color: var(--neon-cyan);
     --secondary-color: var(--violet-glow);
@@ -26,7 +26,7 @@
 }
 
 [data-theme="dark"] {
-    /* Dark Mode Colors */
+    
     --primary-color: var(--electric-blue);
     --accent-color: var(--neon-cyan);
     --secondary-color: var(--violet-glow);
@@ -203,6 +203,27 @@ nav button.active {
     transition: border-color 0.3s, background 0.3s, color 0.3s;
     background: var(--bg-primary);
     color: var(--text-primary);
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.form-group input[type="file"]::-webkit-file-upload-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 12px;
+    transition: all 0.2s;
+}
+
+.form-group input[type="file"]::-webkit-file-upload-button:hover {
+    background: var(--accent-color);
 }
 
 .form-group input:focus,

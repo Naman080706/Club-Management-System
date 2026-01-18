@@ -113,8 +113,125 @@ function addMember(event) {
     showNotification('Member added successfully!', 'success');
 }
 
+function handleFileImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (fileExtension === 'csv') {
+        parseCSVFile(file);
+    } else if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        showNotification('Please convert Excel file to CSV format first. In Excel: File > Save As > CSV (Comma delimited)', 'info');
+        event.target.value = ''; // Reset file input
+    } else {
+        showNotification('Please select a CSV or Excel file.', 'error');
+        event.target.value = ''; // Reset file input
+    }
+}
+
+function parseCSVFile(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        
+        if (lines.length < 2) {
+            showNotification('CSV file must contain a header row and at least one data row.', 'error');
+            return;
+        }
+        
+        // Skip header row and parse data
+        const headers = lines[0].split(',').map(h => h.trim());
+        const importedMembers = [];
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (let i = 1; i < lines.length; i++) {
+            const values = parseCSVLine(lines[i]);
+            
+            if (values.length < 4) {
+                errorCount++;
+                continue;
+            }
+            
+            const member = {
+                id: Date.now() + i,
+                name: values[0].trim(),
+                regNumber: values[1].trim(),
+                role: values[2].trim(),
+                contact: values[3].trim()
+            };
+            
+            // Validate required fields
+            if (member.name && member.regNumber && member.role && member.contact) {
+                // Check if registration number already exists
+                const exists = members.some(m => m.regNumber === member.regNumber);
+                if (!exists) {
+                    importedMembers.push(member);
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } else {
+                errorCount++;
+            }
+        }
+        
+        if (importedMembers.length > 0) {
+            members.push(...importedMembers);
+            localStorage.setItem('clubMembers', JSON.stringify(members));
+            displayMembers();
+            showNotification(`${successCount} member(s) imported successfully!${errorCount > 0 ? ` ${errorCount} row(s) skipped.` : ''}`, 'success');
+        } else {
+            showNotification(`No valid members found. Please check your CSV format.${errorCount > 0 ? ` ${errorCount} row(s) had errors.` : ''}`, 'error');
+        }
+        
+        // Reset file input
+        document.getElementById('csvFile').value = '';
+    };
+    
+    reader.onerror = function() {
+        showNotification('Error reading file. Please try again.', 'error');
+        document.getElementById('csvFile').value = '';
+    };
+    
+    reader.readAsText(file);
+}
+
+function parseCSVLine(line) {
+    const values = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            values.push(current);
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    values.push(current); // Add last value
+    
+    return values;
+}
+
 function displayMembers() {
     const container = document.getElementById('membersList');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    
+    // Show/hide clear all button based on member count
+    if (members.length > 0) {
+        clearAllBtn.style.display = 'block';
+    } else {
+        clearAllBtn.style.display = 'none';
+    }
     
     if (members.length === 0) {
         container.innerHTML = '<div class="empty-state"><p>No members added yet. Add your first member above!</p></div>';
@@ -132,6 +249,28 @@ function displayMembers() {
             </div>
         </div>
     `).join('');
+}
+
+function clearAllMembers() {
+    if (members.length === 0) {
+        showNotification('No members to clear.', 'info');
+        return;
+    }
+    
+    const confirmMessage = `Are you sure you want to delete all ${members.length} member(s)?\n\nThis action cannot be undone and will also remove all attendance records.`;
+    
+    if (confirm(confirmMessage)) {
+        const memberCount = members.length;
+        members = [];
+        localStorage.setItem('clubMembers', JSON.stringify(members));
+        
+        // Also clear all attendance records
+        attendance = {};
+        localStorage.setItem('clubAttendance', JSON.stringify(attendance));
+        
+        displayMembers();
+        showNotification(`All ${memberCount} member(s) deleted successfully!`, 'success');
+    }
 }
 
 function deleteMember(id) {
