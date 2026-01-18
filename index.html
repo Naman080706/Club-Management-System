@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>🏆 Club Management System</h1>
+                    <p>Manage Members, Events & Attendance</p>
+                </div>
+                <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><button onclick="showSection('members')" class="active" id="nav-members">Members</button></li>
+                <li><button onclick="showSection('events')" id="nav-events">Events</button></li>
+                <li><button onclick="showSection('attendance')" id="nav-attendance">Attendance</button></li>
+            </ul>
+        </nav>
+
+        <!-- Members Section -->
+        <div id="members" class="section active">
+            <h2>Members Management</h2>
+            
+            <div class="card">
+                <h3>Add New Member</h3>
+                <form id="memberForm" onsubmit="addMember(event)">
+                    <div class="form-group">
+                        <label for="memberName">Name *</label>
+                        <input type="text" id="memberName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regNumber">Registration Number *</label>
+                        <input type="text" id="regNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberRole">Role *</label>
+                        <select id="memberRole" required>
+                            <option value="">Select Role</option>
+                            <option value="Chairperson">Chairperson</option>
+                            <option value="Vice Chairperson">Vice Chairperson</option>
+                            <option value="Secretary">Secretary</option>
+                            <option value="Vice Secretary">Vice Secretary</option>
+                            <option value="Junior Core">Junior Core</option>
+                            <option value="Senior Core">Senior Core</option>
+                            <option value="Member">Member</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberContact">Contact Details *</label>
+                        <input type="text" id="memberContact" placeholder="Email or Phone" required>
+                    </div>
+                    <button type="submit" class="btn">Add Member</button>
+                </form>
+            </div>
+
+            <div class="list-container">
+                <h3>Members List</h3>
+                <div id="membersList"></div>
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div id="events" class="section">
+            <h2>Event Calendar</h2>
+            
+            <div class="card">
+                <h3>Create New Event</h3>
+                <form id="eventForm" onsubmit="addEvent(event)">
+                    <div class="form-group">
+                        <label for="eventName">Event Name *</label>
+                        <input type="text" id="eventName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDate">Date *</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTime">Time *</label>
+                        <input type="time" id="eventTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDescription">Description</label>
+                        <textarea id="eventDescription"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Create Event</button>
+                </form>
+            </div>
+
+            <div class="toggle-view">
+                <button onclick="toggleEventView('list')" id="view-list" class="active">List View</button>
+                <button onclick="toggleEventView('calendar')" id="view-calendar">Calendar View</button>
+            </div>
+
+            <div id="eventList" class="event-list active">
+                <div id="eventsListContainer"></div>
+            </div>
+
+            <div id="eventCalendar" class="calendar-container">
+                <div id="calendarView"></div>
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div id="attendance" class="section">
+            <h2>Attendance Marking</h2>
+            
+            <div class="card">
+                <h3>Select Event</h3>
+                <div class="form-group">
+                    <label for="attendanceEvent">Choose Event *</label>
+                    <select id="attendanceEvent" onchange="loadAttendanceForEvent()" required>
+                        <option value="">Select an Event</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="attendanceSummary" style="display: none;">
+                <div class="summary-card">
+                    <h3>Attendance Summary</h3>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalMembers">0</div>
+                            <div class="stat-label">Total Members</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="presentCount">0</div>
+                            <div class="stat-label">Present</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="absentCount">0</div>
+                            <div class="stat-label">Absent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Registration Number</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
